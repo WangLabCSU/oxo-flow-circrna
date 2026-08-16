@@ -17,6 +17,9 @@ format_version = "1.0"
 sample_pattern = "raw/{sample}_1.fastq.gz"
 
 [config]
+# Engine-injected at run time from the sample_pattern discovery; declared here
+# so `validate` passes on a fresh clone (the injected list wins at run time).
+samples_list = ""
 # === The only path you need to set ===
 # reference_dir/ layout: genome.fa, genes.gtf, hg38_ref.txt,
 #   bwa/genome.fa.{bwt,pac,ann,amb,sa}, hisat2/genome.fa.{1-8}.ht2,

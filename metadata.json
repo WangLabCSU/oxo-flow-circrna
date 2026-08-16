@@ -12,7 +12,7 @@
   "rule_count": 9,
   "tools": ["fastp", "ciriquant", "circexplorer2", "find_circ", "circrna_finder", "r-base", "multiqc"],
   "installation": {
-    "engine": "oxo-flow >= 0.11.0",
+    "engine": "oxo-flow >= 0.12.0",
     "toolchain": "conda envs — pinned (envs/*.yaml, one per tool)",
     "requirements": [
       "reference_dir with genome.fa, genes.gtf, hg38_ref.txt, CIRIquant.yml",

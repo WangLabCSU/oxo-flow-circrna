@@ -18,30 +18,56 @@ sample_pattern = "raw/{sample}_1.fastq.gz"
 
 [config]
 # === The only path you need to set ===
-# All indexes and reference paths are auto-derived from this directory.
-# Expected layout:
-#   {reference_dir}/genome.fa
-#   {reference_dir}/genes.gtf
-reference_dir = "/data/references/GRCh38"
+# reference_dir/ layout: genome.fa, genes.gtf, hg38_ref.txt,
+#   bwa/genome.fa.{bwt,pac,ann,amb,sa}, hisat2/genome.fa.{1-8}.ht2,
+#   bowtie2/genome.fa.*.bt2, star/
+reference_dir = "./reference"
 
-# === Auto-derived from reference_dir — override any of these if your layout differs ===
-reference_fasta = "{config.reference_dir}/genome.fa"
-gene_annotation = "{config.reference_dir}/genes.gtf"
-circexplorer2_ref = "{config.reference_dir}/hg38_ref.txt"
-ciriquant_config = "{config.reference_dir}/CIRIquant.yml"
-
-# Engine-injected at runtime: merged, sorted sample list from raw/ discovery.
-# The empty string is a validate-time placeholder — discovered samples are appended.
-samples_list = ""
+# Optional: files outside the default layout. Uncomment and set concrete paths
+# (relative or absolute); each overrides the auto-derived value for that file.
+# reference_fasta = "/path/genome.fa"
+# gene_annotation = "/path/genes.gtf"
+# bwa_index = "/path/bwa/genome.fa"
+# hisat2_index = "/path/hisat2/genome.fa"
+# bowtie2_index = "/path/bowtie2/genome.fa"
+# star_index = "/path/star"
 
 [defaults]
 threads = 8
 memory = "16G"
 
-# === Indexes ===
-# Auto-built on first run from reference_dir. No manual steps needed.
-# To customize or add indexes, declare [[references]] blocks explicitly.
-# See: https://traitome.github.io/oxo-flow/reference/workflow-format/#references
+# === Indexes: existing files reused, missing auto-built ===
+[[references]]
+name = "bowtie2_index"
+output = "{config.bowtie2_index}.1.bt2"
+build = "mkdir -p $(dirname {config.bowtie2_index}) && bowtie2-build --threads 8 {config.reference_fasta} {config.bowtie2_index}"
+threads = 8
+memory = "16G"
+description = "Bowtie2 index used by find_circ"
+
+[[references]]
+name = "star_index"
+output = "{config.star_index}/SAindex"
+build = "mkdir -p {config.star_index} && STAR --runMode genomeGenerate --genomeDir {config.star_index} --genomeFastaFiles {config.reference_fasta} --sjdbGTFfile {config.gene_annotation} --runThreadN 16"
+threads = 8
+memory = "16G"
+description = "STAR index used by circRNA_finder"
+
+[[references]]
+name = "bwa_index"
+output = "{config.bwa_index}.bwt"
+build = "mkdir -p $(dirname {config.bwa_index}) && bwa index -p {config.bwa_index} {config.reference_fasta}"
+threads = 8
+memory = "16G"
+description = "BWA index used by CIRIquant"
+
+[[references]]
+name = "hisat2_index"
+output = "{config.hisat2_index}.1.ht2"
+build = "mkdir -p $(dirname {config.hisat2_index}) && hisat2-build -p 8 {config.reference_fasta} {config.hisat2_index}"
+threads = 8
+memory = "16G"
+description = "HISAT2 index used by CIRIquant"
 
 # === Sub-workflows ===
 [[include]]

@@ -9,7 +9,7 @@ circRNA detection pipeline built on [oxo-flow](https://github.com/Traitome/oxo-f
 
 ```bash
 # 1. Set reference_dir in circrna.oxoflow (the only path you need to configure)
-#    reference_dir = "/data/references/GRCh38"
+#    reference_dir = "./reference"
 
 # 2. Place paired FASTQ files in raw/
 #    raw/SAMPLE_01_1.fastq.gz, raw/SAMPLE_01_2.fastq.gz, ...
@@ -45,7 +45,8 @@ cd oxo-flow-circrna
 ### 3. Requirements
 
 - **Reference data** (`reference_dir`): `genome.fa`, `genes.gtf`, `hg38_ref.txt`
-  (CIRCexplorer2), `CIRIquant.yml` — see [Reference Data](#reference-data).
+  (CIRCexplorer2) plus index subdirectories `bwa/`, `bowtie2/`, `hisat2/`, `star/`
+  — see [Reference Data](#reference-data).
 - **Reads**: paired FASTQ per sample in `raw/` (`<sample>_1.fastq.gz` /
   `<sample>_2.fastq.gz`); samples are auto-discovered.
 - **Compute**: 8 threads / 32 GB per rule at most.
@@ -73,17 +74,21 @@ bash test/run.sh   # validate + lint + dry-run on synthetic fixtures, exits 0
 Place your reference files in a directory with this structure:
 
 ```
-/data/references/GRCh38/
+reference/
 ├── genome.fa              # Reference FASTA (required)
+├── genome.fa.fai          # FASTA index (samtools faidx)
 ├── genes.gtf              # Gene annotation (GENCODE, required)
-├── CIRIquant.yml          # CIRIquant config (required for the CIRIquant caller)
-└── hg38_ref.txt           # CIRCexplorer2 reference (optional: fetch_ucsc.py hg38 > hg38_ref.txt)
+├── hg38_ref.txt           # CIRCexplorer2 reference (optional: fetch_ucsc.py hg38 > hg38_ref.txt)
+├── bwa/genome.fa.{bwt,pac,ann,amb,sa}
+├── bowtie2/genome.fa.{1,2,3,4,rev.1,rev.2}.bt2
+├── hisat2/genome.fa.{1-8}.ht2
+└── star/
 ```
 
-Set `reference_dir = "/data/references/GRCh38"` in `circrna.oxoflow`.
+Set `reference_dir = "./reference"` in `circrna.oxoflow` (or point it at your own directory).
 
-**All indexes are auto-built on first run** — BWA, Bowtie2, STAR, HISAT2, FASTA index,
-and sequence dictionary. No manual index building needed.
+**Missing indexes are auto-built on first run** — BWA, Bowtie2, STAR, HISAT2.
+Already-built indexes are reused as-is and never rebuilt.
 
 > To skip auto-building (e.g., indexes already exist): `oxo-flow run circrna.oxoflow --skip-ref-build`
 
@@ -94,14 +99,18 @@ and sequence dictionary. No manual index building needed.
 ```toml
 [config]
 # The only path you need to set:
-reference_dir = "/data/references/GRCh38"
+reference_dir = "./reference"
 
 # Optional: override individual paths if your layout differs
 # reference_fasta = "/custom/path/genome.fa"
 # gene_annotation = "/custom/path/genes.gtf"
+# bwa_index = "/custom/path/bwa/genome.fa"
+# hisat2_index = "/custom/path/hisat2/genome.fa"
+# bowtie2_index = "/custom/path/bowtie2/genome.fa"
+# star_index = "/custom/path/star"
 ```
 
-All other paths (bwa_index, bowtie2_index, star_index, hisat2_index, minimap2_index, gatk_dict, samtools_faidx) are auto-derived from `reference_dir`.
+Index paths (bwa_index, bowtie2_index, star_index, hisat2_index) are auto-derived from `reference_dir` and declared as `[[references]]`: existing indexes are reused, missing ones are auto-built on first run.
 
 ### Input Data
 

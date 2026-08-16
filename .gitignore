@@ -13,6 +13,9 @@ raw/
 *.tmp
 *.bak
 
+# User reference data (symlinks / auto-generated CIRIquant.yml)
+reference/
+
 # Conda environments (user creates these)
 .envs/
 

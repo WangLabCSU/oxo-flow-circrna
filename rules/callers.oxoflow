@@ -17,9 +17,29 @@ description = "CIRIquant circRNA detection"
 shell = """
 mkdir -p results/{sample}.CIRI
 
+BWA=$(command -v bwa) || exit 1
+HISAT2=$(command -v hisat2) || exit 1
+STRINGTIE=$(command -v stringtie) || exit 1
+SAMTOOLS=$(command -v samtools) || exit 1
+cat > results/{sample}.CIRI/ciriquant.yml <<EOF
+name: hg38
+
+tools:
+  bwa: $BWA
+  hisat2: $HISAT2
+  stringtie: $STRINGTIE
+  samtools: $SAMTOOLS
+
+reference:
+  fasta: {config.reference_fasta}
+  gtf: {config.gene_annotation}
+  bwa_index: {config.bwa_index}
+  hisat_index: {config.hisat2_index}
+EOF
+
 CIRIquant -t {threads} \
     -1 {input[0]} -2 {input[1]} \
-    --config {config.ciriquant_config} \
+    --config results/{sample}.CIRI/ciriquant.yml \
     --no-gene \
     -o results/{sample}.CIRI -p {sample} -v
 
@@ -48,13 +68,13 @@ description = "CIRCexplorer2 circRNA detection"
 shell = """
 mkdir -p results/{sample}.circexplorer2
 
-bwa mem -t {threads} -T 19 {config.reference_fasta} {input[0]} {input[1]} \
+bwa mem -t {threads} -T 19 {config.bwa_index} {input[0]} {input[1]} \
     > results/{sample}.circexplorer2/{sample}_unmapped_bwa.sam 2> results/{sample}.circexplorer2/{sample}_bwa.log
 
 CIRCexplorer2 parse -t BWA -b results/{sample}.circexplorer2/{sample}_circ2_result.txt results/{sample}.circexplorer2/{sample}_unmapped_bwa.sam \
     > results/{sample}.circexplorer2/{sample}_parse.log 2>&1
 
-CIRCexplorer2 annotate -r {config.circexplorer2_ref} -g {config.reference_fasta} \
+CIRCexplorer2 annotate -r {config.reference_dir}/hg38_ref.txt -g {config.reference_fasta} \
     -b results/{sample}.circexplorer2/{sample}_circ2_result.txt -o results/{sample}.circexplorer2/{sample}_circ2_result_ann.txt
 
 if [ -f results/{sample}.circexplorer2/{sample}_circ2_result_ann.txt ]; then

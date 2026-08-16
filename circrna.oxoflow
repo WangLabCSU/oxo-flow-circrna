@@ -45,6 +45,9 @@ threads = 8
 memory = "16G"
 description = "Bowtie2 index used by find_circ"
 
+[references.environment]
+conda = "envs/circrna_finder.yaml"
+
 [[references]]
 name = "star_index"
 output = "{config.star_index}/SAindex"
@@ -52,6 +55,9 @@ build = "mkdir -p {config.star_index} && STAR --runMode genomeGenerate --genomeD
 threads = 8
 memory = "16G"
 description = "STAR index used by circRNA_finder"
+
+[references.environment]
+conda = "envs/circrna_finder.yaml"
 
 [[references]]
 name = "bwa_index"

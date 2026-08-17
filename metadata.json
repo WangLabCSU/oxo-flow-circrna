@@ -5,12 +5,37 @@
   "rating": "community",
   "created": "2026-08-15",
   "domain": "transcriptomics (circRNA)",
-  "tags": ["circrna", "ciriquant", "circexplorer2", "find-circ", "circrna-finder", "ensemble"],
+  "tags": [
+    "circrna",
+    "ciriquant",
+    "circexplorer2",
+    "find-circ",
+    "circrna-finder",
+    "ensemble"
+  ],
   "description": "Circular RNA detection with four independent callers (CIRIquant, CIRCexplorer2, find_circ, circRNA_finder) and ensemble aggregation of calls supported by at least two methods. Indexes and conda environments are built automatically on first run from a single reference_dir; samples are auto-discovered from raw/ with no CSV.",
-  "scope": ["fastp", "ciriquant", "circexplorer2", "find_circ", "circrna_finder", "annotation", "aggregate", "aggregate_dataset", "multiqc"],
+  "scope": [
+    "aggregate",
+    "aggregate_dataset",
+    "circexplorer2",
+    "circrna_finder",
+    "ciriquant",
+    "fastp",
+    "find_circ",
+    "multiqc",
+    "report"
+  ],
   "excluded": [],
   "rule_count": 9,
-  "tools": ["fastp", "ciriquant", "circexplorer2", "find_circ", "circrna_finder", "r-base", "multiqc"],
+  "tools": [
+    "fastp",
+    "ciriquant",
+    "circexplorer2",
+    "find_circ",
+    "circrna_finder",
+    "r-base",
+    "multiqc"
+  ],
   "installation": {
     "engine": "oxo-flow >= 0.12.0",
     "toolchain": "conda envs — pinned (envs/*.yaml, one per tool)",

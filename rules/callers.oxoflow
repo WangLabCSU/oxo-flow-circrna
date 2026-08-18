@@ -56,7 +56,10 @@ CIRI2="$CONDA_PREFIX/lib/python2.7/site-packages/libs/CIRI2.pl"
     -O results/{sample}.CIRI/{sample}.ciri \
     -F {config.reference_fasta} -A {config.gene_annotation} \
     -0 -T {threads} -G results/{sample}.CIRI/{sample}.ciri2.log
-JUNCS=$(grep -vc "^#" results/{sample}.CIRI/{sample}.ciri || true)
+# count data rows only — CIRI2's header does NOT start with '#'
+# (live: grep -vc "^#" counted the header as one junction and
+# CIRIquant ran anyway, straight back into the de-novo hang).
+JUNCS=$(tail -n +2 results/{sample}.CIRI/{sample}.ciri | grep -c . || true)
 if [ "$JUNCS" -eq 0 ]; then
     echo "CIRI2 predicted no junctions — skipping CIRIquant (upstream de-novo hang on empty prediction)" >&2
 else

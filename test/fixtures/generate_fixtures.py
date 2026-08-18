@@ -70,8 +70,11 @@ def build_reference():
 def bsj_pair(chr1):
     """Read pair with R1 spanning the exon3->exon2 back-splice junction."""
     e2, e3 = EXONS[1], EXONS[2]
-    # 25 bp of e2's tail + 25 bp of e3's head = one 50 bp chimeric read
-    r1 = chr1[e2[1] - 25 : e2[1]] + chr1[e3[0] - 1 : e3[0] - 1 + 25]
+    # 25 bp of e3's head (downstream exon) + 25 bp of e2's tail
+    # (upstream exon) = one 50 bp chimeric read. The 5' segment MUST
+    # map downstream of the 3' segment — live: the inverted order read
+    # as a forward junction and CIRI2 saw zero candidates.
+    r1 = chr1[e3[0] - 1 : e3[0] - 1 + 25] + chr1[e2[1] - 25 : e2[1]]
     # Mate sits downstream in e3
     pos = e3[0] + 30 - 1
     r2 = chr1[pos : pos + READ_LEN]

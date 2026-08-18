@@ -42,15 +42,33 @@ reference:
   hisat_index: {config.hisat2_index}
 EOF
 
-# stdin is /dev/null so CIRIquant's hisat2 subprocesses cannot hang on
-# the engine's open stdin pipe when the tool's error path leaves them
-# orphaned (live: 'index does not exist' parked two hisat2 processes
-# reading the rule's stdin for 40+ min).
-CIRIquant -t {threads} \
-    -1 {input[0]} -2 {input[1]} \
-    --config results/{sample}.CIRI/ciriquant.yml \
-    --no-gene \
-    -o results/{sample}.CIRI -p {sample} -v < /dev/null
+# Run CIRI2 first — the exact prediction CIRIquant runs internally.
+# When it predicts zero junctions, CIRIquant's de-novo stage would
+# build an empty index and hang forever on orphaned hisat2 processes
+# (live: 'index does not exist', two hisat2 perls parked in
+# wait_for_partner for 40+ min). Zero junctions means there is
+# nothing for CIRIquant to quantify, so the empty bed IS its result.
+bwa mem -t {threads} -T 19 {config.bwa_index} {input[0]} {input[1]} \
+    > results/{sample}.CIRI/unmapped.sam 2> /dev/null
+# CIRI2.pl is not on the env PATH — CIRIquant adds libs/ at runtime.
+CIRI2="$CONDA_PREFIX/lib/python2.7/site-packages/libs/CIRI2.pl"
+"$CIRI2" -I results/{sample}.CIRI/unmapped.sam \
+    -O results/{sample}.CIRI/{sample}.ciri \
+    -F {config.reference_fasta} -A {config.gene_annotation} \
+    -0 -T {threads} -G results/{sample}.CIRI/{sample}.ciri2.log
+JUNCS=$(grep -vc "^#" results/{sample}.CIRI/{sample}.ciri || true)
+if [ "$JUNCS" -eq 0 ]; then
+    echo "CIRI2 predicted no junctions — skipping CIRIquant (upstream de-novo hang on empty prediction)" >&2
+else
+    # stdin is /dev/null so CIRIquant's subprocesses cannot hang on
+    # the engine's open stdin pipe (belt and braces; the zero-junction
+    # path above is the common case).
+    CIRIquant -t {threads} \
+        -1 {input[0]} -2 {input[1]} \
+        --config results/{sample}.CIRI/ciriquant.yml \
+        --no-gene \
+        -o results/{sample}.CIRI -p {sample} -v < /dev/null
+fi
 
 if [ -f results/{sample}.CIRI/{sample}.gtf ]; then
     grep -v "#" results/{sample}.CIRI/{sample}.gtf | awk '{print $14}' | cut -d '.' -f1 > results/{sample}.CIRI/{sample}.counts

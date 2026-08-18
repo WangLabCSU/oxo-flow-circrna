@@ -29,6 +29,13 @@ EXONS = [(100, 250), (400, 550), (700, 850)]
 def build_reference():
     rng = random.Random(SEED)
     chr1 = "".join(rng.choice("ACGT") for _ in range(1000))
+    # CIRI2 filters junctions through gtag_pem_repeat, which requires
+    # canonical splice motifs at the back-splice junction (live: zero
+    # predicted junctions on a random genome -> empty de-novo index ->
+    # 'index does not exist'). Place the acceptor AG just before e3's
+    # 5' end and the donor GT just after e2's 3' end (0-based).
+    e2, e3 = EXONS[1], EXONS[2]
+    chr1 = chr1[:550] + "GT" + chr1[552:697] + "AG" + chr1[699:]
     chr2 = "".join(rng.choice("ACGT") for _ in range(200))
     os.makedirs(REF, exist_ok=True)
     with open(os.path.join(REF, "genome.fa"), "w") as f:
@@ -84,15 +91,15 @@ def write_reads(chr1):
     rng = random.Random(SEED + 7)
     pairs = []
     for _ in range(20):
-        pairs.append(bsj_pair(chr1))
+        pairs.append(bsj_pair(chr1) + (True,))
     for _ in range(180):
-        pairs.append(regular_pair(chr1, rng))
+        pairs.append(regular_pair(chr1, rng) + (False,))
     rng.shuffle(pairs)
     with gzip.open(os.path.join(RAW, "SAMPLE01_1.fastq.gz"), "wt") as f1, gzip.open(
         os.path.join(RAW, "SAMPLE01_2.fastq.gz"), "wt"
     ) as f2:
-        for i, (r1, r2) in enumerate(pairs):
-            name = f"@S1_{i}_BSJ" if i < 20 else f"@S1_{i}"
+        for i, (r1, r2, is_bsj) in enumerate(pairs):
+            name = f"@S1_{i}_BSJ" if is_bsj else f"@S1_{i}"
             f1.write(f"{name}\n{r1}\n+\n{'I' * READ_LEN}\n")
             f2.write(f"{name}\n{r2}\n+\n{'I' * READ_LEN}\n")
 

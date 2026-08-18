@@ -13,6 +13,11 @@ output = ["results/{sample}.CIRI.bed"]
 depends_on = ["fastp"]
 threads = 8
 memory = "32G"
+# bounded fail-fast: CIRIquant's error path can leave orphaned
+# subprocesses hanging forever (live: 'index does not exist' left two
+# hisat2 processes parked at 0% CPU for 40+ min) — the engine kills
+# the whole process group at the limit.
+time_limit = "2h"
 description = "CIRIquant circRNA detection"
 shell = """
 mkdir -p results/{sample}.CIRI

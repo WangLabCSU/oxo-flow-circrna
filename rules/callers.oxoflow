@@ -42,11 +42,15 @@ reference:
   hisat_index: {config.hisat2_index}
 EOF
 
+# stdin is /dev/null so CIRIquant's hisat2 subprocesses cannot hang on
+# the engine's open stdin pipe when the tool's error path leaves them
+# orphaned (live: 'index does not exist' parked two hisat2 processes
+# reading the rule's stdin for 40+ min).
 CIRIquant -t {threads} \
     -1 {input[0]} -2 {input[1]} \
     --config results/{sample}.CIRI/ciriquant.yml \
     --no-gene \
-    -o results/{sample}.CIRI -p {sample} -v
+    -o results/{sample}.CIRI -p {sample} -v < /dev/null
 
 if [ -f results/{sample}.CIRI/{sample}.gtf ]; then
     grep -v "#" results/{sample}.CIRI/{sample}.gtf | awk '{print $14}' | cut -d '.' -f1 > results/{sample}.CIRI/{sample}.counts

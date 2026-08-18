@@ -13,7 +13,8 @@ input = [
     "results/{sample}.CIRI.bed",
     "results/{sample}.circexplorer2.bed",
     "results/{sample}.find_circ.bed",
-    "results/{sample}.circRNA_finder.bed"
+    "results/{sample}.circRNA_finder.bed",
+    "{config.gene_annotation}"
 ]
 output = ["results/{sample}.aggr.txt"]
 threads = 2

@@ -8,7 +8,7 @@ version = "1.0.0"
 # === CIRIquant: Alignment-based circRNA detection ===
 [[rules]]
 name = "ciriquant"
-input = ["trimmed/{sample}_1.fastq.gz", "trimmed/{sample}_2.fastq.gz"]
+input = ["trimmed/{sample}_1.fastq.gz", "trimmed/{sample}_2.fastq.gz", "{config.reference_fasta}", "{config.gene_annotation}"]
 output = ["results/{sample}.CIRI.bed"]
 depends_on = ["fastp"]
 threads = 8
@@ -59,7 +59,7 @@ conda = "envs/ciriquant.yaml"
 # === CIRCexplorer2: Junction-based circRNA detection ===
 [[rules]]
 name = "circexplorer2"
-input = ["trimmed/{sample}_1.fastq.gz", "trimmed/{sample}_2.fastq.gz"]
+input = ["trimmed/{sample}_1.fastq.gz", "trimmed/{sample}_2.fastq.gz", "{config.reference_dir}/hg38_ref.txt", "{config.reference_fasta}"]
 output = ["results/{sample}.circexplorer2.bed"]
 depends_on = ["fastp"]
 threads = 8
@@ -90,7 +90,7 @@ conda = "envs/circexplorer2.yaml"
 # === find_circ: Anchor-based circRNA detection ===
 [[rules]]
 name = "find_circ"
-input = ["trimmed/{sample}_1.fastq.gz", "trimmed/{sample}_2.fastq.gz"]
+input = ["trimmed/{sample}_1.fastq.gz", "trimmed/{sample}_2.fastq.gz", "{config.reference_fasta}"]
 output = ["results/{sample}.find_circ.bed"]
 depends_on = ["fastp"]
 threads = 8

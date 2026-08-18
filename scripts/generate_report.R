@@ -13,7 +13,21 @@ OutFile <- args[2]
 aggr_files <- list.files(InDir, pattern = "aggr\\.txt$", full.names = TRUE)
 if (length(aggr_files) == 0) stop("No aggregation files found")
 
-data <- rbindlist(lapply(aggr_files, fread))
+# zero-calls placeholder lines ("No circRNAs detected for <sample>")
+# fread as 1-column tables — treat them as empty aggregates so the
+# report renders the zero state instead of strsplit failing on NULL.
+read_aggr <- function(f) {
+    d <- tryCatch(fread(f, sep = "\t"), error = function(e) NULL)
+    if (is.null(d) || nrow(d) == 0 ||
+        !all(c("tool", "count", "sample") %in% names(d))) {
+        return(data.table(tool = character(0), count = numeric(0),
+                          chr = character(0), start = integer(0),
+                          end = integer(0), strand = character(0),
+                          gene = character(0), sample = character(0)))
+    }
+    d
+}
+data <- rbindlist(lapply(aggr_files, read_aggr), use.names = TRUE, fill = TRUE)
 samples <- unique(data$sample)
 
 n_circrna <- nrow(data)

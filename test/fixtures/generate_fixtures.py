@@ -4,7 +4,7 @@
 Layout (identical to the previous hand-made kit):
   reference/genome.fa        chr1 (1000 bp, hosts G1) + chr2 (200 bp decoy)
   reference/genes.gtf        G1 with three exons on chr1
-  reference/hg38_ref.txt     'chrom start end' per reference sequence
+  reference/hg38_ref.txt     CIRCexplorer2 ref: gene_id iso_id chrom strand
   raw/SAMPLE01_{1,2}.fastq.gz  ~200 read pairs; ~10% carry the exon3->exon2
                              back-splice junction so the circRNA callers
                              (CIRCexplorer2/find_circ/CIRIquant/
@@ -47,8 +47,10 @@ def build_reference():
                 'transcript_id "G1_t1";\n'
             )
     with open(os.path.join(REF, "hg38_ref.txt"), "w") as f:
-        f.write("chr1\t1\t1000\n")
-        f.write("chr2\t1\t200\n")
+        # CIRCexplorer2's ref format: gene_id isoform_id chrom strand
+        # (live: parse_ref got a 3-field 'chrom start end' line and
+        # raised 'not enough values to unpack (expected 4, got 3)').
+        f.write("G1\tG1_t1\tchr1\t+\n")
     return chr1, chr2
 
 

@@ -68,6 +68,11 @@ minimal kit it reports zero junctions and the rule emits an empty bed
 (aggregation then relies on the other 3 methods, which do detect the
 synthetic circle). This mirrors the upstream channel semantics: a
 caller with zero calls is a completed step, not a failure.
+On the minimal kit, find_circ detects the synthetic circle while the
+other callers report zero calls, so the 2-method ensemble reports no
+consensus — the dataset matrix is written empty rather than failing.
+Both tolerances exist in the scripts themselves (aggregate_beds.R /
+aggregate_dataset.R).
 
 ## Features
 

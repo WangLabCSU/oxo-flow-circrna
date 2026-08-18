@@ -14,7 +14,9 @@ input = [
     "results/{sample}.circexplorer2.bed",
     "results/{sample}.find_circ.bed",
     "results/{sample}.circRNA_finder.bed",
-    "{config.gene_annotation}"
+    "{config.gene_annotation}",
+    "scripts/aggregate_beds.R",
+    "scripts/common.py"
 ]
 output = ["results/{sample}.aggr.txt"]
 threads = 2
@@ -33,7 +35,7 @@ conda = "envs/annotation.yaml"
 # === Aggregate across all samples ===
 [[rules]]
 name = "aggregate_dataset"
-input = ["results/*.aggr.txt"]
+input = ["results/*.aggr.txt", "scripts/aggregate_dataset.R"]
 output = ["results/results_circRNA.tsv.gz"]
 depends_on = ["aggregate"]
 threads = 2

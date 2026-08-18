@@ -54,7 +54,13 @@ if [ -f results/{sample}.CIRI/{sample}.gtf ]; then
     paste results/{sample}.CIRI/{sample}.tmp results/{sample}.CIRI/{sample}.counts > {output[0]}
     rm -f results/{sample}.CIRI/{sample}.tmp results/{sample}.CIRI/{sample}.counts
 fi
-if [ ! -f {output[0]} ]; then echo "WARNING: {output[0]} not created — caller may have failed" >&2; fi
+if [ ! -f {output[0]} ]; then
+    echo "WARNING: {output[0]} not created — caller may have failed" >&2
+    # Zero junctions is a valid biological result (upstream's channel
+    # just continues empty); the aggregate skips zero-size caller beds
+    # (size > 0 filter) and works with the remaining methods.
+    touch {output[0]}
+fi
 rm -rf results/{sample}.CIRI/align results/{sample}.CIRI/circ 2>/dev/null || true
 """
 

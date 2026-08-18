@@ -38,7 +38,35 @@ if (!is.null(AllSampleList) && nchar(AllSampleList) > 0) {
 }
 
 message("Merging results...")
-AllData <- rbindlist(lapply(fileList, fread))
+read_one <- function(f) {
+    d <- tryCatch(fread(f, sep = "\t"), error = function(e) NULL)
+    if (is.null(d) || nrow(d) == 0 ||
+        !all(c("gene", "strand", "chr", "start", "end") %in% names(d))) {
+        # per-sample aggregate wrote the zero-calls placeholder
+        # ("No circRNAs detected for <sample>") — nothing to merge
+        return(data.table(gene = character(0), strand = character(0),
+                          chr = character(0), start = integer(0),
+                          end = integer(0), count = numeric(0),
+                          sample = character(0)))
+    }
+    d
+}
+AllData <- rbindlist(lapply(fileList, read_one), use.names = TRUE, fill = TRUE)
+
+out_path <- file.path(OutDir, paste0(basename(InDir), "_circRNA.tsv.gz"))
+if (nrow(AllData) == 0) {
+    # zero calls across all samples — emit the canonical empty matrix
+    message("No circRNAs in any sample — writing an empty matrix")
+    fwrite(data.table(id = character(0), gene = character(0),
+                      strand = character(0), chrom = character(0),
+                      startUpBSE = integer(0), endDownBSE = integer(0),
+                      tool = character(0)),
+           file = out_path, sep = "\t")
+    message("Output: ", out_path)
+    message("Total circRNAs: 0")
+    quit(save = "no", status = 0)
+}
+
 AllData[, id := paste(gene, strand, chr, start, end, sep = ":")]
 AllData[, tool := "four_methods"]
 AllData <- dcast(AllData, id + gene + strand + chr + start + end + tool ~ sample, value.var = "count", fill = 0)

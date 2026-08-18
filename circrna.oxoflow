@@ -70,6 +70,9 @@ threads = 8
 memory = "16G"
 description = "BWA index used by CIRIquant"
 
+[references.environment]
+conda = "envs/ciriquant.yaml"
+
 [[references]]
 name = "hisat2_index"
 output = "{config.hisat2_index}.1.ht2"
@@ -77,6 +80,9 @@ build = "mkdir -p $(dirname {config.hisat2_index}) && hisat2-build -p 8 {config.
 threads = 8
 memory = "16G"
 description = "HISAT2 index used by CIRIquant"
+
+[references.environment]
+conda = "envs/ciriquant.yaml"
 
 # === Sub-workflows ===
 [[include]]

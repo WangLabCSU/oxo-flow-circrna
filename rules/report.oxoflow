@@ -7,7 +7,7 @@ version = "1.0.0"
 # === Generate HTML report ===
 [[rules]]
 name = "report"
-input = ["results/*.aggr.txt"]
+input = ["results/*.aggr.txt", "scripts/generate_report.R"]
 output = ["results/circrna_report.html"]
 depends_on = ["aggregate"]
 threads = 2

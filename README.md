@@ -59,6 +59,21 @@ cd oxo-flow-circrna
 bash test/run.sh   # validate + lint + dry-run on synthetic fixtures, exits 0
 ```
 
+The synthetic fixtures carry one exon3->exon2 back-splice junction
+with splice motifs placed at both the exon boundaries (CIRI2's
+gtag_pem_repeat windows) and find_circ's anchor boundaries, so the
+callers have real signal. Note the scale caveat: CIRIquant's CIRI2
+statistical filters were designed for full-scale RNA-seq — on this
+minimal kit it reports zero junctions and the rule emits an empty bed
+(aggregation then relies on the other 3 methods, which do detect the
+synthetic circle). This mirrors the upstream channel semantics: a
+caller with zero calls is a completed step, not a failure.
+On the minimal kit, find_circ detects the synthetic circle while the
+other callers report zero calls, so the 2-method ensemble reports no
+consensus — the dataset matrix is written empty rather than failing.
+Both tolerances exist in the scripts themselves (aggregate_beds.R /
+aggregate_dataset.R).
+
 ## Features
 
 - **4 detection methods**: CIRIquant, CIRCexplorer2, find_circ, circRNA_finder

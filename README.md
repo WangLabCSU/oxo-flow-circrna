@@ -2,8 +2,9 @@
 
 circRNA detection pipeline built on [oxo-flow](https://github.com/Traitome/oxo-flow).
 
-> ☆ Community · ✦ Original — part of the
-> [oxo-flow-community catalog](https://oxo-flow-community.github.io/).
+> ★ Verified · ✦ Original — live-tested end-to-end (see the
+> [site audit](https://oxo-flow-community.github.io/about/audits/circrna-2026-08/)).
+> Part of the [oxo-flow-community catalog](https://oxo-flow-community.github.io/).
 
 ## Quick Start (3 steps)
 
@@ -50,8 +51,9 @@ cd oxo-flow-circrna
 - **Reads**: paired FASTQ per sample in `raw/` (`<sample>_1.fastq.gz` /
   `<sample>_2.fastq.gz`); samples are auto-discovered.
 - **Compute**: 8 threads / 32 GB per rule at most.
-- **Tools**: conda environments in `envs/` (pinned) — conda or mamba builds
-  them automatically on first run; no manual tool installation.
+- **Tools**: conda environments in `envs/` — one per tool (most tools
+  version-pinned); conda or mamba builds them automatically on first run;
+  no manual tool installation.
 
 ## Test
 
@@ -168,7 +170,7 @@ Callers are independent — aggregation works with 2+ of 4 methods succeeding.
 
 ## Requirements
 
-- **oxo-flow** >= 0.9.0
+- **oxo-flow** >= 0.12.0
 - **Conda / Mamba / Micromamba** (auto-detected)
 - **Memory**: 32GB recommended (CIRIquant and circRNA_finder need 32GB each)
 - **Disk**: 50GB+ for indices, varies for outputs

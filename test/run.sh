@@ -16,8 +16,12 @@ echo "==> lint (errors fail, warnings ok)"
 grep -q "0 error(s)" /tmp/circrna-lint-$$.txt || { echo "lint found errors"; exit 1; }
 
 echo "==> dry-run (samples from fixtures; missing external references are warnings, not errors)"
+# Engine headline wording changed in oxo-flow 0.20.1 (Traitome/oxo-flow#432):
+# the old "DAG: (dry-run) N rules would execute" became
+# "Plan: would run: N | skip: M | completed: K". Accept either so CI passes
+# with both the latest release and older pins.
 "$OXO" dry-run circrna.oxoflow > /tmp/circrna-dryrun-$$.txt 2>&1
-grep -q "would execute" /tmp/circrna-dryrun-$$.txt
+grep -qE "would (execute|run)" /tmp/circrna-dryrun-$$.txt
 
 echo "==> debug: expanded commands contain no literal {wildcards}"
 "$OXO" debug circrna.oxoflow 2>&1 | grep -q '{sample}' && { echo "unexpanded wildcards"; exit 1; } || true

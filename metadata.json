@@ -3,6 +3,14 @@
   "title": "circRNA detection: four callers with ensemble aggregation",
   "origin": "original",
   "rating": "live-verified",
+  "engine": "oxo-flow",
+  "source": {
+    "repo": "WangLabCSU/oxo-flow-circrna",
+    "url": "https://github.com/WangLabCSU/oxo-flow-circrna",
+    "tag": "main",
+    "sha": "13660b0548f4df448ea838a3ced52bd82116973a",
+    "license": "Apache-2.0"
+  },
   "created": "2026-08-15",
   "domain": "transcriptomics (circRNA)",
   "tags": [

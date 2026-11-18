@@ -12,7 +12,12 @@ echo "==> validate"
 "$OXO" validate circrna.oxoflow
 
 echo "==> lint (errors fail, warnings ok)"
-"$OXO" lint circrna.oxoflow > /tmp/circrna-lint-$$.txt 2>&1 || true
+LINT_RC=0
+"$OXO" lint circrna.oxoflow > /tmp/circrna-lint-$$.txt 2>&1 || LINT_RC=$?
+echo "DEBUG oxo-flow lint exit code: ${LINT_RC}"
+echo "DEBUG oxo-flow lint raw output begin"
+cat "/tmp/circrna-lint-$$.txt"
+echo "DEBUG oxo-flow lint raw output end"
 grep -q "0 error(s)" /tmp/circrna-lint-$$.txt || { echo "lint found errors"; exit 1; }
 
 echo "==> dry-run (samples from fixtures; missing external references are warnings, not errors)"

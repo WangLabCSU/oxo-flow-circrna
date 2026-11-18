@@ -14,12 +14,6 @@ echo "==> validate"
 echo "==> lint (errors fail, warnings ok)"
 LINT_RC=0
 "$OXO" lint circrna.oxoflow > /tmp/circrna-lint-$$.txt 2>&1 || LINT_RC=$?
-echo "DEBUG oxo-flow lint exit code: ${LINT_RC}"
-echo "DEBUG oxo-flow lint raw output begin"
-cat "/tmp/circrna-lint-$$.txt"
-echo "DEBUG oxo-flow lint raw output end"
-LINT_RC=0
-"$OXO" lint circrna.oxoflow > /tmp/circrna-lint-$$.txt 2>&1 || LINT_RC=$?
 cat "/tmp/circrna-lint-$$.txt"
 if [ "$LINT_RC" -ne 0 ]; then
   echo "lint: oxo-flow lint reported errors (engine exit code $LINT_RC) - failing"
